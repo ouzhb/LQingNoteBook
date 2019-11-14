@@ -1,0 +1,17 @@
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: spark-env
+spec:
+  selector:
+    matchLabels:
+      app: spark-application 
+  env:
+    - name: SPARK_MASTER
+      value: local
+  volumeMounts:
+    - mountPath: /userdata
+      name: userdata-volume
+  volumes:
+    - name: userdata-volume
+      emptyDir: {}

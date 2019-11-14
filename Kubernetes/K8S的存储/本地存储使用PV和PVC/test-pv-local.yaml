@@ -1,0 +1,15 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: test-pv-local
+  labels:
+    type: local
+spec:
+  storageClassName: local-storage #可以任意指定，即使不存在
+  persistentVolumeReclaimPolicy:  Retain # 默认是Retain
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/data"

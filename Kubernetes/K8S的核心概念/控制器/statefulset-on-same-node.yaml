@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: test-ss
+spec:
+  selector:
+    matchLabels:
+      app: test-ss
+  serviceName: test-ss
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: test-ss
+    spec:
+      affinity:
+      # 该亲和性配置保证test-ss-0,test-ss-1,test-ss-2，每次调度必定位于1，2,3三个节点
+
+        # 保证副本运行在不同节点
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector: 
+              matchExpressions: [{ key: app,operator: In,values: [test-ss] }]
+            topologyKey: "kubernetes.io/hostname"
+
+        nodeAffinity:
+          # 保证pod落在指定范围的节点上
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions: [{key: node,operator: In,values: ["1","2","3"]}]
+          # 保证选择顺序
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - {weight: 100, preference: { matchExpressions: [{key: node,operator: In,values: ["2"]}]}}
+          - {weight: 50, preference: { matchExpressions: [{key: node,operator: In,values: ["1"]}]}}
+
+      containers:
+      - name: centos
+        image: jdeathe/centos-ssh

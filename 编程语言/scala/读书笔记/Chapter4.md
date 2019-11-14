@@ -1,0 +1,25 @@
+
+- 构造不可变Map
+    - val scores = Map ("Alice"->10,"Blob"->12)
+- 构造可变Map
+    - val scores = scala.collection.mutable.Map("Alice"->10,"Blob"->12)
+- 构造空Map
+    - val scores = scala.collection.mutable.Map[String,Int ]()
+- Map的常用接口
+    - contains，getOrElse("key","default_value")
+    - get返回Option对象，而() 直接返回值（当key不存在时，抛出异常 ）
+    - withDefault设定默认值
+    - “+=”添加额外的映射，“-=”删除一个key 
+- 迭代Map
+    - for((k,v) <- 映射)
+    - for( k <- 映射.keySet>)
+    - for( k <- 映射.values>)
+- 排序Map scala.collection.mutable.SortedMap
+- 插入保序的Map scala.collection.mutable.LinkedHashMap
+- 与Java类型相互转换
+    - import scala.collection.JavaConversions.mapAsScalaMap
+    - import scala.collection.JavaConversions.propertiesAsScalaMap
+    - import scala.collection.JavaConversions.mapAsJavaMap
+- 元组(type1,type2,type3)
+    - 访问元组_1、_2...(从1开始而不是从0开始)
+    - Array的zip接口--生成元组Array

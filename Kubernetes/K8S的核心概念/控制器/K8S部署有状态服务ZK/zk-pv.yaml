@@ -1,0 +1,51 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zk-pv-1
+  labels:
+    type: local
+  # 限制指定的文件系统用户权限
+  annotations:
+    pv.beta.kubernetes.io/gid: "1000"
+spec:
+  storageClassName: local-dir #可以任意指定，即使不存在
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/zk/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zk-pv-2
+  labels:
+    type: local
+  annotations:
+    pv.beta.kubernetes.io/gid: "1000"
+spec:
+  storageClassName: local-dir #可以任意指定，即使不存在
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/zk/data"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zk-pv-3
+  labels:
+    type: local
+  annotations:
+    pv.beta.kubernetes.io/gid: "1000"
+spec:
+  storageClassName: local-dir #可以任意指定，即使不存在
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/zk/data"

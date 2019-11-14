@@ -1,0 +1,46 @@
+kind: ReplicationController
+apiVersion: v1
+metadata:
+  name: lqing-test-rc
+spec:
+  replicas: 3
+  # selector 可以不写！默认和template.metadata.labels 一致
+  # selector:
+  #   app: spark-app
+  template:
+    metadata:
+      name: test-rc
+      labels:
+        app: lqing-test-rc
+    spec:
+      # nodeSelector: 
+      #   node: "1"
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms: 
+      #       - matchExpressions: # 以下的matchExpressions需要全部满足
+      #         - { key: node, operator: NotIn, values: ["1"]}
+      #     preferredDuringSchedulingIgnoredDuringExecution:
+      #       - weight: 100 # 范围是1-100，优先满足weight得分最高的策略
+      #         preference:
+      #           matchExpressions:
+      #           - { key: node, operator: In, values: ["2"] } 
+      affinity:
+        # podAffinity:
+        #   requiredDuringSchedulingIgnoredDuringExecution:
+        #   - labelSelector:
+        #       matchExpressions:
+        #       - {key: app, operator: In, values: [lqing-test-rc]}
+        #     topologyKey: kubernetes.io/hostname # 这里topologyKey是node的一个Label Key
+        
+        # 反亲和性可以让replicas分布在不同节点上
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - {key: app, operator: In, values: [lqing-test-rc]}
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: centos
+        image: jdeathe/centos-ssh

@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: preset-pod-test
+spec:
+  template:
+    metadata:
+      name: preset-pod-test
+      labels:
+        app: spark-application
+      annotations:
+          podpreset.admission.kubernetes.io/podpreset-spark-env: "resource version"
+    spec:
+      containers:
+        - name: preset-pod-test
+          image: jdeathe/centos-ssh
+          imagePullPolicy: IfNotPresent
