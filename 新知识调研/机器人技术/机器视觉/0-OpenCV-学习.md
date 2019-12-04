@@ -40,6 +40,41 @@ IntelRealSense官方提供了ROS上的相关驱动，官方[github](https://gith
 
 Xtion使用[openni2_camera](http://wiki.ros.org/openni2_camera)驱动，使用相机是可以参考[openni2_launch](http://docs.ros.org/api/openni2_launch/html/)。
 
+```shell
+# 安装IntelRealSense的步骤
+
+# 添加仓库公钥
+sudo apt-key adv --keyserver keys.gnupg.net --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+
+# 添加仓库
+sudo add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main" -u
+
+# 安装以下依赖包
+sudo apt-get install librealsense2-dkms
+sudo apt-get install librealsense2-utils
+sudo apt-get install librealsense2-dev # 这个包用来编译：g++ -std=c++11 filename.cpp -lrealsense2
+sudo apt-get install librealsense2-dbg
+sudo apt install -y ros-kinetic-ddynamic-reconfigure
+sudo apt install -y ros-kinetic-ddynamic-reconfigure-python
+
+# 安装完成后执行以下命令，验证依赖安装结果
+realsense-viewer
+modinfo uvcvideo | grep "version:" # 包含realsense 字符串
+
+# 将realsense-ros仓库的密码Copy到SRC目录，执行编译安装
+
+catkin_init_workspace # 在src目录执行
+catkin_make clean     # 在工程目录执行
+catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
+catkin_make install
+
+# echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+# source ~/.bashrc
+
+# 在ROS中运行，其他topic和参数信息可以参考，git官网
+roslaunch realsense2_camera rs_camera.launch
+```
+
 ### 3. webcam 
 
  webcam是指通过USB接入的“即插即用”相机，此类相机没有专门的驱动程序，通过系统工具工作。
