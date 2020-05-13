@@ -9,7 +9,7 @@ services:
     network_mode: crate
     volumes:
       - /tmp/crate/01:/data
-    command: crate -Cnetwork.host=_site_ -Ccluster.name=cluster -Cnode.name=crate01 -Cnode.master=true -Cnode.data=true -Cdiscovery.seed_hosts=crate02,crate03 -Ccluster.initial_master_nodes=crate01,crate02 -Cgateway.expected_nodes=3 -Cgateway.recover_after_nodes=2
+    command: crate -Cdiscovery.zen.minimum_master_nodes=2 -Cnetwork.host=_site_ -Ccluster.name=cluster -Cnode.name=crate01 -Cnode.master=true -Cnode.data=true -Cdiscovery.seed_hosts=crate02,crate03 -Ccluster.initial_master_nodes=crate01,crate02 -Cgateway.expected_nodes=3 -Cgateway.recover_after_nodes=2
     environment:
       - CRATE_HEAP_SIZE=2g
 
@@ -22,7 +22,7 @@ services:
     network_mode: crate
     volumes:
       - /tmp/crate/02:/data
-    command: crate -Cnetwork.host=_site_ -Ccluster.name=cluster -Cnode.name=crate02 -Cnode.master=true -Cnode.data=true -Cdiscovery.seed_hosts=crate01,crate03 -Ccluster.initial_master_nodes=crate01,crate02 -Cgateway.expected_nodes=3 -Cgateway.recover_after_nodes=2
+    command: crate -Cdiscovery.zen.minimum_master_nodes=2 -Cnetwork.host=_site_ -Ccluster.name=cluster -Cnode.name=crate02 -Cnode.master=true -Cnode.data=true -Cdiscovery.seed_hosts=crate01,crate03 -Ccluster.initial_master_nodes=crate01,crate02 -Cgateway.expected_nodes=3 -Cgateway.recover_after_nodes=2
     environment:
       - CRATE_HEAP_SIZE=2g
 
@@ -35,6 +35,6 @@ services:
     network_mode: crate
     volumes:
       - /tmp/crate/03:/data
-    command: crate -Cnetwork.host=_site_ -Ccluster.name=cluster -Cnode.name=crate03 -Cnode.master=true -Cnode.data=true -Cdiscovery.seed_hosts=crate01,crate02 -Ccluster.initial_master_nodes=crate01,crate02 -Cgateway.expected_nodes=3 -Cgateway.recover_after_nodes=2
+    command: crate -Cdiscovery.zen.minimum_master_nodes=2 -Cnetwork.host=_site_ -Ccluster.name=cluster -Cnode.name=crate03 -Cnode.master=true -Cnode.data=true -Cdiscovery.seed_hosts=crate01,crate02 -Ccluster.initial_master_nodes=crate01,crate02 -Cgateway.expected_nodes=3 -Cgateway.recover_after_nodes=2
     environment:
       - CRATE_HEAP_SIZE=2g
