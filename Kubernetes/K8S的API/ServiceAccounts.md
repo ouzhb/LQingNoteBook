@@ -4,7 +4,15 @@
 
 每个NS下包含一个名为default的ServiceAccount，创建POD时这个SA会被自动注入Pod中（通过volume的方式）。
 
-每个ServiceAccount包含一个secret，这个Secret用来完成Kubernetes API的认证。
+每个ServiceAccount包含以下内容：
+
+- namespace：表明工作空间
+
+- token：apiserver 通过私钥签发 token 
+
+- CA：用于验证apiserver的服务端证书（HTTPS双向验证）
+
+上述信息都通过Secret的方式存储。
 
 ## Secret
 
