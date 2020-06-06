@@ -1,3 +1,20 @@
+---
+title: Kubernetes学习笔记 -- 安装Harbor仓库
+categories: "笔记"
+date: 2019-07-16
+comments: true
+toc: true
+tags:
+	- Kubernetes
+    - Docker
+    - Harbor
+---
+
+Kubernetes学习笔记 -- 安装Harbor仓库
+
+
+<!--more-->
+
 # 安装部署
 
 - 下载离线安装包 harbor-offline-installer-v1.10.2.tar.gz 解压

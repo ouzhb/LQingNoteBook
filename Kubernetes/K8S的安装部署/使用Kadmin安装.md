@@ -1,3 +1,18 @@
+---
+title: Kubernetes学习笔记 -- Kadmin安装单机环境
+categories: "笔记"
+date: 2019-07-16
+comments: true
+toc: true
+tags:
+	- Kubernetes
+    - Docker
+---
+
+
+
+<!--more-->
+
 # 安装 kubeadm（控制面单点）
 
 ## 1. 前提条件
