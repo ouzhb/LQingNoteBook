@@ -40,7 +40,7 @@ kubectl -n kubevirt wait kv kubevirt --for condition=Available
 
 ## 3.虚拟机镜像
 
-
+略～～
 
 # 参考
 
