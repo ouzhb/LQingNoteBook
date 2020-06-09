@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: keepalived-vip
+  name: vip-configmap
+data:
+  172.24.33.39: default/echoheaders
