@@ -18,7 +18,7 @@
     mkdir -p /ISO/repodata
  
     # 从RPM包下载机器同步附加的RPM包到 /ISO/Packages
-    rsync -vazu  172.24.33.80:/root/centos7-vbox-packages /ISO/Packages/
+    rsync -vazu  172.24.33.80:/root/centos7-vbox-packages/ /ISO/Packages/
 
     ```
 - 编辑打包脚本
