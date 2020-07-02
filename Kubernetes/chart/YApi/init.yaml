@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-yapi
+spec:
+  template:
+    spec:
+      containers:
+      - name: init-yapi
+        image: registry.cn-hangzhou.aliyuncs.com/anoy/yapi:latest
+        workingDir: /api/vendors
+        command: ["npm",  "run","install-server"]
+        volumeMounts:
+          - name: config
+            mountPath: "/api/config.json"
+            subPath: config.json
+      volumes:
+        - name: config
+          configMap:
+            name: yapi-config
+            items:
+              - key: config.json
+                path: config.json
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yapi-config
+data:
+  config.json: |
+    {
+      "port": "3000",
+      "adminAccount": "admin@admin.com",
+      "timeout":120000,
+      "db": {
+        "servername": "mongodb-replicaset-0.mongodb-replicaset.mongodb.svc.cluster.local.",
+        "DATABASE": "yapi",
+        "port": 27017
+      }
+    }

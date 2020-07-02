@@ -14,46 +14,26 @@ spec:
     spec:
       containers:
       - name: yapi
-        image: rjharbor.goblin.com/middleware/yapi:latest
+        image: registry.cn-hangzhou.aliyuncs.com/anoy/yapi:latest
         imagePullPolicy: IfNotPresent
+        workingDir: /api/vendors
         command:
-          - bash
-          - "/wait-for-it.sh"
-          - "mongodb-replicaset-0.mongodb-replicaset.mongodb.svc.cluster.local.:27017"
-          - "--"
-          - "entrypoint.sh"
+          - node
+          - "server/app.js"
         ports:
         - containerPort: 3000
-        envFrom:
-        - configMapRef:
-            name: yapi-config
         volumeMounts:
-#          - mountPath: "/home/vendors"
-#            name: vendors
-          - mountPath: "/home/log"
-            name: log
+          - name: config
+            mountPath: "/api/config.json"
+            subPath: config.json
       volumes:
-#        - name: vendors
-#          persistentVolumeClaim:
-#            claimName: yapi
-        - name: log
-          hostPath:
-            path: /var/log/yapi
+        - name: config
+          configMap:
+            name: yapi-config
+            items:
+              - key: config.json
+                path: config.json
       restartPolicy: Always
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: yapi-config
-data:
-  VERSION: "1.5.6"
-  LOG_PATH: "/tmp/yapi.log"
-  HOME: "/home"
-  PORT: "3000"
-  ADMIN_EMAIL: "linqing@ruijie.com.cn"
-  DB_SERVER: "mongodb-replicaset-0.mongodb-replicaset.mongodb.svc.cluster.local."
-  DB_NAME: "yapi"
-  DB_PORT: "27017"
 ---
 apiVersion: v1
 kind: Service
@@ -71,15 +51,3 @@ spec:
     targetPort: 3000
   selector:
     app: yapi
-#---
-#kind: PersistentVolumeClaim
-#apiVersion: v1
-#metadata:
-#  name: yapi
-#spec:
-#  storageClassName: openebs-localpv
-#  accessModes:
-#    - ReadWriteOnce
-#  resources:
-#    requests:
-#      storage: 10Gi
