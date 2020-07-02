@@ -1,0 +1,21 @@
+# Minio
+---
+  image:
+    repository: "rjharbor.goblin.com/middleware/minio"
+    tag: "RELEASE.2020-02-07T04-56-50Z"
+  accessKey: "admin"
+  secretKey: "ruijie@123"
+  persistence:
+    size: "200Gi"
+    storageClass: "openebs-cstor"
+
+# Mongodb-replicaset
+---
+  replicas: 1
+  persistentVolume:
+    storageClass: "openebs-localpv"
+    size: 30Gi
+  image:
+    repository: "rjharbor.goblin.com/middleware/mongo"
+  installImage:
+    repository: "rjharbor.goblin.com/middleware/mongodb-install"

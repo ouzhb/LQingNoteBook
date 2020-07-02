@@ -63,7 +63,7 @@ systemctl start kubelet
 国内源
 
 ```shell
-cat <<EOF > kubernetes.repo
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64

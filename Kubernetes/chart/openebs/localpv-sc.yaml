@@ -1,0 +1,15 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-localpv
+  annotations:
+    openebs.io/cas-type: local
+    cas.openebs.io/config: |
+      - name: StorageType
+        value: hostpath
+      - name: BasePath
+        value: /data/openebs/local
+provisioner: openebs.io/local
+reclaimPolicy: Delete
+# WaitForFirstConsumer 表示只有当 POD 实际使用到 PV 时才会创建目录
+volumeBindingMode: WaitForFirstConsumer
