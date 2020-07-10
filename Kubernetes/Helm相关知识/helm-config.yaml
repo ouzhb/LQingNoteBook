@@ -7,7 +7,7 @@
   secretKey: "ruijie@123"
   persistence:
     size: "200Gi"
-    storageClass: "openebs-cstor"
+    storageClass: "openebs-localpv"
 
 # Mongodb-replicaset
 ---
