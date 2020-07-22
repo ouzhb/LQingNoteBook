@@ -1,0 +1,28 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: policy-role
+rules:
+- apiGroups: ['policy']
+  resources: ['podsecuritypolicies']
+  verbs:     ['use']
+  resourceNames:
+  - example
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: policyrolebinding
+roleRef:
+  kind: ClusterRole
+  name: policy-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+# Authorize specific service accounts:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+# Authorize specific users (not recommended):
+- kind: User
+  apiGroup: rbac.authorization.k8s.io
+  name: admin

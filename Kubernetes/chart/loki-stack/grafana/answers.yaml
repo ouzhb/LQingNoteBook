@@ -8,3 +8,4 @@ testFramework.image.repository: rjharbor.goblin.com/loki-stack/bats
 testFramework.image.tag: "0.4.0"
 sidecar.image: rjharbor.goblin.com/loki-stack/k8s-sidecar:0.1.75
 persistence.enabled: true
+admin.existingSecret: grafana-auth

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: centos7-ssh
+spec:
+  containers:
+    - name: centos7-ssh
+      image: rjharbor.goblin.com/library/centos-ssh:latest
+      ports:
+        - containerPort: 22
+          hostPort: 2333
