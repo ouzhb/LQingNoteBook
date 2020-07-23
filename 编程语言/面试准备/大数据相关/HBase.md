@@ -17,7 +17,7 @@
 
 # 2. HBase 逻辑视图
 
-- HBase的数据存取模型为： Table：（RowKey、Family（Column(Timestamp）)))--> Value
+- HBase的数据存取模型为： Table：（RowKey、Family（Column ( Timestamp）)))--> Value
 - 每行有一个 Row Key，数据根据 Row Key 排序
 - 一行中多个列组成一个列族。
     - 列族在建表时定义好，不可以变动

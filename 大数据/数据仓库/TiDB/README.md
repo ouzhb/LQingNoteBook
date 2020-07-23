@@ -101,10 +101,10 @@ TiDB的官方仓库提供了 [Bench Market](https://github.com/pingcap/tidb-benc
     - TiSpark不支持批量导入，而使用JDBC导入数据的性能太差。
   
 3. 可用性：6分。
- 
+
    - 极其耗费磁盘性能，上生产需要使用专用SSD！
    - TiSpark 和 CDH Spark 似乎有一些兼容性问题！
-   - pingCAP提供的官方文档虽然比较全面，但是玩家似乎还比较少遇到故障时，FAQ资料很少，因此故障运维难度不小。
+   - pingCAP提供的官方文档虽然比较全面，但是玩家似乎还比较少，遇到故障时，FAQ资料很少，因此故障运维难度不小。
 
 
 总体来说，目前TiDB和无线的大数据场景并不契合。
