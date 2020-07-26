@@ -59,7 +59,7 @@ HBase中包含Marjor、Minjor两种压缩过程：
 # 6. HBase 宕机如何处理？
 
 HMaster 会将该 HRegionServer 所负责的 region 转移到其他 HRegionServer 上，并且会对 HRegionServer 上存在 memstore 中还未持久化到磁盘中的数据进行恢复;
-这个恢复的工作是由 WAL重播 来完成，这个过程如下：
+这个恢复的工作是由 WAL重播 来完成。
 
 # 7. hbase如何获取region存储位置信息
 
