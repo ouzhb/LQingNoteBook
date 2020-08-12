@@ -68,10 +68,13 @@ hosts allow = 172.24.9.0/24
 auth users = root
 secrets file = /etc/rsyncd.passwd # 该文件需要在服务端指定，格式为root:passwd，权限为600
 
-# 发送端配置，使用默认配置即可，接收端和服务端都需要启动daemon进程
+# 接收端启动rsyncd守护
 rsync --daemon
 
-# 发送端执行，/etc/rsync.passwd中需要指定用户密码
+# 发送端创建密码文件，权限为600
+echo "ruijie" > /etc/rsync.passwd
+
+# 发送端执行
 rsync -a --password-file=/etc/rsync.passwd /data/data_ssd/omc/ node12::OMC
 ```
 
