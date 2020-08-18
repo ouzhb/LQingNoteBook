@@ -21,16 +21,26 @@
 
 - pod的指标采集，如何自动进行动态伸缩
 
+- Promethus 监控方案
+- kube-status-metric等服务能够采集到那些指标
+
 - 关于DNS
     - DNS Server中几种记录的区别， 是怎么工作的？
-    - 如何搭建一个DNS服务（CoreDNS）？
+    - ~~如何搭建一个DNS服务（CoreDNS）？~~
     - CoreDNS在k8s中是如何工作的？
-    - 添加自定义DNS记录到K8S中？
+    - ~~添加自定义DNS记录到K8S中？~~
     
 - 关于pause 容器
 
     - 提供Pod的基础命名空间
     - 作为init进程，回收僵尸进程
+
+- 了解不同的CNI的工作方式 
+- 了解以下几种网络模型的工作原理
+    
+    - flannel
+    - calico
+    - culium
 
 
 
