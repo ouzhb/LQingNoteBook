@@ -42,5 +42,7 @@
     - calico
     - culium
 
+- Kubernetes 详细安装步骤
 
+    - [kubernetes-the-hard-way](https://github.com/kelseyhightower/kubernetes-the-hard-way)
 
