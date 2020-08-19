@@ -31,7 +31,7 @@
     ip link set veth1 netns netns1
     ip nethns exec netns1 ifconfig veth1 10.1.1.1/24 up
     ifconfig veth0 10.1.1.2/24 up 
-    ```  
+    ```
 - 相比而言，真实的网络设备只能放在，根命名空间中
 
 
@@ -69,6 +69,20 @@ int main(int argc, char *argv[]) {
 }
   
 ```
+
+# VLAN
+
+VLAN 可以将一个物理的二层网络划分成最多4093个逻辑网络，每个逻辑网络由 VLAN ID 区分。
+
+linux中一个网卡可以同时支持 VLAN10 和 VLAN 20，即一张网卡可以收发不同网段的数据～～！！
+
+PS：前提是这张网卡在交换上要连接到trunk口
+
+
+
+# VXLAN
+
+VXLAN 是一种***基于UDP工作的隧道协议***，用户可以将二层数据封装到UDP的数据包中，从而在三层提供以太网二层服务。
 
 # 参考
 
