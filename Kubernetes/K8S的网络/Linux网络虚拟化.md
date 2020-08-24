@@ -22,6 +22,8 @@
     ip netns exec netns1 ip link set dev lo up
     
     ```
+- 使用```ip netns```来管理docker的网络命名空间```ln -s /var/run/docker/netns  /var/run/netns ```
+
 # 关于veth pair
 
 - 成对出现的虚拟以太网卡，每一端都可以放到不同的netns中

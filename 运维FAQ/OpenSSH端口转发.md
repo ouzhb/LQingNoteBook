@@ -21,10 +21,10 @@ SSH tunneling 可以通过以下方式进行工作：
 
 
 ```shell
-# Local Port Forwarding，54321是本地监听端口，<DES_IP>:<DES_IP>是目的地址，<RemoteServer>是代理的用户名
-ssh -N -L 54321:<DES_IP>:<DES_IP> username@<RemoteServer>
+# Local Port Forwarding，54321是本地监听端口，<DES_IP>:<DES_port>是目的地址，<RemoteServer>是代理的用户名
+ssh -N -L 54321:<DES_IP>:<DES_port> username@<RemoteServer>
 # Remote Port Forwarding
-ssh -f -N -g -R 2900:<DES_IP>:<DES_IP> username@<LocalServer>
+ssh -f -N -g -R 2900:<DES_IP>:<DES_port> username@<LocalServer>
 
 # 其他参数的含义
 # -N 表示不要打开shell
@@ -34,6 +34,45 @@ ssh -f -N -g -R 2900:<DES_IP>:<DES_IP> username@<LocalServer>
 # -f 后台tunnel进程后台执行
 # -g 网关方式运行tunnel
 
+```
+
+
+
+# 应用
+
+## 1.从云主机访问内网主机
+
+```shell
+# 内网主机执行以下命令，即连接67.230.170.14的9999端口并将数据转发到本机的22端口
+ssh -N -R 9999:localhost:22 root@67.230.170.14
+# 公网主机通过9999端口连接内网主机
+ssh -p 9999 root@localhost
+
+# 如果用户在公网服务器开启了 GatewayPorts（9999被绑定到网卡中，而不是本地） ，可以通过下面的方式直接连接到内网主机
+ssh -p 9999 root@67.230.170.14
+
+# 使用autossh进行自动重连，内网主机监控云端的3333端口，PS：这样要配置主机A到主机B的免密
+autossh -M 3333 -NR 9999:localhost:22 root@gobthf.lqingcloud.cn -p 2900
+```
+
+将autossh隧道做成服务
+
+```
+[Unit]
+Description=The proxy server
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/usr/bin/autossh -M 3333 -NR 9999:localhost:22 root@gobthf.lqingcloud.cn -p 2900
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -9 $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 # 参考
