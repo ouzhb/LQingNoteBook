@@ -97,5 +97,30 @@ PS：**需要注意几个问题**
 - 按照上面的方式重启Kube-Proxy 之后，iptable模式时遗留的Rule不会自动清除，需要手动或者重启机器清除
 - Kubernetes 1.18 使用的IPVS依赖较高版本的内核模块，需要升级内核版本，否则Kube-Proxy可能一直报错（参考：[iSSUE 89520](https://github.com/kubernetes/kubernetes/issues/89520)）。
 
+### IPVS的工作原理
+
+IPVS支持以下几种模式的负载均衡：
+
+- NAT模式
+- Direct Routing模式
+- IP Tunneling模式
+- Full NAT模式
+
+PS：原生IPVS中NAT模式不会进行SNAT，只有一些基于IPVS二次开发的发行版支持Full NAT模式。
+```
+通常报文的请求、转发、返回路径有以下两种模式：
+
+- 双臂模式：数据的进出都经过director
+- 三角模式：数据从director进入，响应从real server直接回到client
+```
+
+上述模式中，Kubernetes主要工作在NAT模式中，并且借助IPtable为package进行SNAT。
+
+IPVS 常用命令：
+```shell
+# 查看当前主机的所有ipvs转发
+ipvsadm -Ln
+```
+
 ## 3.关于SNAT
 
