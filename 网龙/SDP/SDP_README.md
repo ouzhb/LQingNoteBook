@@ -14,14 +14,27 @@ SDP涉及的软件基础服务，如下图：
 
 ![image-20200829205725919](..\..\images\ND\SDP软件基础服务.png)
 
-## 1. Portal
+## K8S
 
-SDP Portal 是用户操作共享平台的入口，所有用户操作均是在这个 Portal 上完成的。
-
-
+### 1. 弹性伸缩方案
 
 
 
+
+
+
+
+# SDP服务Kubernetes部分架构
+
+- kube-system
+	- coreDNS
+	- ipvs
+	- flannel
+- java-init-agent: registry.101.com/sdp/java-init-agent:1.8 ???
+- log-download: registry.101.com/sdp/nginx
+- main-domain：用来引入外部服务
+- nginx-ingress/nginx-ws-ingress
+- sdp-monitor：registry.101.com/sdp/centos7.6:v2 
 
 
 
