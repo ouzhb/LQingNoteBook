@@ -12,13 +12,11 @@ tags:
 
 Kubernetes学习笔记 -- 安装Harbor仓库
 
-
 <!--more-->
 
-# 安装部署
+# 1.Docker安装部署
 
 - 下载离线安装包 harbor-offline-installer-v1.10.2.tar.gz 解压
-
 - 编辑 harbor.yml ，注意以下配置：
 
 	- hostname：主机名（填：harbor）
@@ -27,12 +25,22 @@ Kubernetes学习笔记 -- 安装Harbor仓库
 	- https.certificate: CA签发到服务端的证书
 	- https.private_key: 服务端私钥
 	- data_volume: 数据目录，映射到主机上
-	
 - 执行prepare，生成配置
-
 - docker-compose启动
 
-# 创建SSL证书
+# 2. Helm包安装
+
+Helm包安装时以下配置需要注意：
+
+- expose.type：当前Harbor支持ingress、nodePort、clusterIP、loadBalancer
+- expose.tls.enabled：是否启用HTTPS
+- expose.tls.secret.secretName：自定义域名密文
+- expose.ingress.hosts.core：ingress生成的域名
+- externalURL：该配置决定了Harbor的地址，配置
+- jobservice.jobLogger：日志服务输出配置，集群部署的时候请设置成database
+- persistence.imageChartStorage.disableredirect：使用外部存储时client是否直连
+
+# 3.创建SSL证书
 
 注意创建时，harbor节点主机名为：harbor
 
@@ -99,12 +107,24 @@ docker login lqdocker.goblin.com:18443 -u admin
 
 ```
 
-# 关于免费SSL证书
+# 4. FAQ
 
-在[letsencrypt](https://letsencrypt.osfipin.com/)可以申请到免费的SSL证书，并且配合[certbot](https://github.com/certbot/certbot)能够自动更新，用户只要拥有一个合法域名基本上就可以获得无限期的SSL证书。
+## 1. 关于Harbor集群
+
+Harbor核心服务包括：core、jobservice、registry 这三个服务可以组成集群，并且每个core实例可以填写不同的**域名**以及**协议**。
+
+可以通过**部署不同helm实例，并共享外部PG、Redis**的方式实现网络分离、多域名绑定等功能，部署时helm配置需要注意以下几点：
+
+- jobservice.jobLogger：日志服务输出配置，集群部署的时候请设置成database
+
+- 不同helm实例中，组件 secret 要配置成一致，否则集群内部通信会出现问题（jobservice、core、registry三个组件）
+
+  
 
 # 参考
 
 [安装包地址](https://github.com/goharbor/harbor)
+
+[harbor-helm](https://github.com/goharbor/harbor-helm)
 
 [配置SSL](https://goharbor.io/docs/1.10/install-config/configure-https/)
