@@ -40,3 +40,5 @@
 - 一个分布式的docker管理工具 [【portainer/portainer】](https://github.com/portainer/portainer)
 
 - Kubernetes扩展编程，参考：https://cloudnative.to/blog/kubernetes-programming-base/
+
+- Kubernetes API接口文档：https://kubernetes.io/docs/reference/kubernetes-api/
