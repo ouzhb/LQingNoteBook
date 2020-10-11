@@ -119,7 +119,14 @@ Harbor核心服务包括：core、jobservice、registry 这三个服务可以组
 
 - 不同helm实例中，组件 secret 要配置成一致，否则集群内部通信会出现问题（jobservice、core、registry三个组件）
 
-  
+## 2. Harbor版本的相关问题
+
+- 测试过程中发现1.9.x 版本之间**Login API**之间有一些差异，1.9.0版本没有进行csrf校验，而1.9.2、1.9.4版本进行了校验。但是1.9.x 版本校验方式又和2.0.x不相同
+- 1.9.0 版本组集群时有同步问题
+- 1.9.x版本的csrf校验可以通过配置文件关闭（1.9.x使用的是 BEEG框架，[参考](https://beego.me/docs/mvc/controller/xsrf.md)），相关配置项为**EnableXSRF=false**。
+- 2.0.x没有找到关闭XSRF校验的配置
+- 关于配置LDAP认证：手工创建了任意一个用户后，无法从DB认证切换到LDAP认证（即使删除掉DB用户也不行？？相信这是一个bug）。恢复方式删除用户，并且删除数据库中对应的表记录
+
 
 # 参考
 
