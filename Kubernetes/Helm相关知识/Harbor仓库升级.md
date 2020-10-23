@@ -11,7 +11,7 @@ cp /data/harbor /data/harbor_backup
 
 # 作为环境变量供调用
 harbor_db_path=/data/harbor/database
-harbor_cfg=/root/harbor/harbor.cfg # 1.50 版本的启动文件
+harbor_cfg=/root/harbor/harbor_150.cfg # 1.50 版本的启动文件
 
 
 # 升级数据库文件（# PS：如果使用了clair和notary，这两个东西要独立升级）
@@ -29,7 +29,7 @@ docker exec  harbor-db /bin/sh -c  "pg_dump -U postgres --inserts --data-only  r
 为了加快数据库导入导出数据，建议清空 registry 库的 img_scan_job 表和 img_scan_overview 表：
 
 ```shell
-docker run -it -d -v /root/lq/database:/var/lib/mysql:z -e MYSQL_ROOT_PASSWORD=root123 --name harbor-db-test vmware/harbor-db:v1.5.0
+docker run -it -d -v ${harbor_db_path}:/var/lib/mysql:z -e MYSQL_ROOT_PASSWORD=root123 --name harbor-db-test vmware/harbor-db:v1.5.0
 
 echo "truncate img_scan_job;" | mysql -proot123 -Dregistry
 echo "truncate img_scan_overview;" | mysql -proot123 -Dregistry
@@ -55,6 +55,26 @@ kubectl -n harbor exec  harbor-harbor-database-0 -- pg_dump -U postgres --insert
 kubectl -n harbor exec  harbor-harbor-database-0 -- pg_dump -U postgres --inserts --data-only  notaryserver > notaryserver-data.sql
 kubectl -n harbor exec  harbor-harbor-database-0 -- pg_dump -U postgres --inserts --data-only  notarysigner > notarysigner-data.sql
 ```
+
+导入数据到DB：
+
+```shell
+# AWSCA 
+PGPASSWORD=LqA8PsEkYM psql -h kong.c8ntakcosoeb.us-west-1.rds.amazonaws.com -p 5431  -d registry -U user_kwdsiYLenK -f xxx.sql
+# HK
+PGPASSWORD=LqA8DsEkYM psql -h master.all.pgsql.hk.sdp -p 5431  -d registry -U user_lkewiYLenK -f xxx.sql
+# cl
+PGPASSWORD=LqclFcXyYM psql -h master.cl.all.pgsql.sdp -p 5431  -d registry -U user_lqcliYLenK -f xxx.sql
+```
+# 升级问题回顾
+
+- 1.7.6 - > 1.9.4 -> 2.0.2 每个版本升级时，harbor-core 都需要花费大量时间重启。如果部署在Kubernetes中，探针机制会主动杀死Harbor Core 导致升级失败。因此需要手工编辑Ready探针的时间（建议直接编辑存活探针到3个小时以上，或者在values.xml中加入配置core.livenessProbe.initialDelaySeconds）.
+- Nginx双跳配置：如果使用的是Ingress暴露Harbor服务，并且Client通过Nginx的反向代理访问Harbor的API。此时要Harbor一侧配置一个Ingress，这个Ingress的配置和原来类似，但是Host指向Nginx代理的域名。（**没理解为啥！！！**）
+- 升级过后LDAP Server连接异常，但是去除 LDAP搜索DN 搜索后恢复正常
+- Properties 表有脏数据，导致debug日志疯狂刷新
+- 远程Registry连接失败，处理方式删除registry表的记录并新建一个，然后将id字段改回旧的
+- GC停止方式：删除数据库记录、admin_job表、清除redis缓存、重启jobservice
+- HK 环境垃圾收集失败，registryctl 容器有 distribution 相关异常。社区的解决方案（[issues-2695](https://github.com/docker/distribution/issues/2695)）：降级到2.5.2版本（2.6.x、2.7.1 都有类似异常）
 
 # 参考
 
