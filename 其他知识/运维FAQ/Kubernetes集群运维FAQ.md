@@ -90,3 +90,24 @@ def socket_test(host, port):
 ```
 
 - 虽然sdp-monitor使用的是容器网络，但是由于整个集群用vxlan组网。因此服务端实际看到的是宿主机ip，只有当sdp-monitor和etcd位于相同节点时，看到的才是容器ip。
+
+## 6. nginx-ingress 证书异常
+
+安全检查工具扫描Nginx的443端口，发现主机使用自签名证书（实际上所有的Ingress都已经使用了*.101.com）。
+
+问题原因：安全工具扫描时直接走的IP没有走域名，ingress针对IP访问是直接使用内置的SSL证书返回，使用curl命令可以验证：
+
+```shell script
+ curl -vv https://172.24.135.12
+############################################################################
+# Server certificate:
+# 	subject: CN=Kubernetes Ingress Controller Fake Certificate,O=Acme Co
+############################################################################
+```
+
+解决方案：
+
+- controller 添加默认证书：--default-ssl-certificate=<ns-name>/<secret-name> PS: ns-name必须指定
+- 重启所有controller
+
+参考 nginx-ingress TLS相关配置：https://kubernetes.github.io/ingress-nginx/user-guide/tls/
