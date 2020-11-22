@@ -27,28 +27,34 @@
     
 - Kubernetes 源码阅读、定制化、工具
     
-    - ktools工具
+    - sdpctl工具
         - ~~shell 批量执行~~
-        - 删除掉一些冗余的功能
-        - docker接口整合，查看运行的容器的Image信息
-        - shell 命令行工具能够支持 &&、管道等
-        - 定制Kubectl，将功能集成
+        - ~~删除掉一些冗余的功能~~
+        - ~~docker接口整合，查看运行的容器的Image信息~~
+        - ~~shell 命令行工具能够支持 &&、管道、~~选择node~~等~~
+        - ~~定制Kubectl，将功能集成~~
+        - falcon、salt-minion 模块
+            - 安装、检查
+            
 
 - Go语言基础
     - ~~基础编程：《Go语言编程》~~
-    - 用go语言开发一个基于ssh/autossh 的隧道工具，能够从公网ssh连接内网的服务器（用docker+nsenter替代）
-    - cobra
+    - ~~用go语言开发一个基于ssh/autossh 的隧道工具，能够从公网ssh连接内网的服务器（用docker+nsenter替代）~~
+    - ~~cobra~~
     - json/yaml 读写解析
-    - go template
+    - go 语言相关博客：https://www.cnblogs.com/nickchen121/p/11517502.html
+        - go template
+            - https://www.cnblogs.com/f-ck-need-u/p/10035768.html
 
 - Kubernetes新特性 
     - 地址kube-schedule，需求如下（参考[iSSUE](https://github.com/kubernetes/kubernetes/issues/1574)）：
         - pod调度不变更Node
         - configmap 重建相关POD
+    - **阿里新控制器项目**：https://github.com/openkruise/kruise/tree/master/docs/tutorial
     
 - Docker相关
     - blob分层机制了解
-    - go-client
+    - ~~go-client~~
     - docker push机制是什么样的
     
     
@@ -71,9 +77,11 @@
     - 一个分布式的docker管理工具 [【portainer/portainer】](https://github.com/portainer/portainer)
     - Harbor升级遇到的种种问题复盘
     - harbor 2.1.0 新版本功能
+        - proxy镜像代理（可以替代镜像同步功能，减少代码开发量）
+        - p2p预热和相关工具更加深入的集成
+        - 不停机垃圾回收
     - 安全扫描插件triy、clair、notry
     - 镜像分发工具 dragonfly / Uber Kraken
-    
 
 - 阅读
     - Kubernetes扩展编程，参考：https://cloudnative.to/blog/kubernetes-programming-base/
