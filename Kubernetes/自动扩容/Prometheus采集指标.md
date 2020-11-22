@@ -12,10 +12,9 @@
 - Kubernetes组件指标，这些指标主要来自api-service
     - api-service：https://<cluster-ip>:6443/metrics
 
-- Service、Endpoint、Ingress可用性的监控；
-    - 
+- Service、Endpoint、Ingress可用性的监控
 
-- 用户应用指标，这些指标用户需要
+- 用户应用指标
 
 
 # Prometheus 服务发现
