@@ -41,7 +41,7 @@
     - ~~基础编程：《Go语言编程》~~
     - ~~用go语言开发一个基于ssh/autossh 的隧道工具，能够从公网ssh连接内网的服务器（用docker+nsenter替代）~~
     - ~~cobra~~
-    - json/yaml 读写解析
+    - ~~json/yaml 读写解析~~
     - go 语言相关博客：https://www.cnblogs.com/nickchen121/p/11517502.html
         - go template
             - https://www.cnblogs.com/f-ck-need-u/p/10035768.html
