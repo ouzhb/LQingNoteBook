@@ -111,3 +111,16 @@ def socket_test(host, port):
 - 重启所有controller
 
 参考 nginx-ingress TLS相关配置：https://kubernetes.github.io/ingress-nginx/user-guide/tls/
+
+## 7. iptables 问题造成的 fannel 网络异常
+
+Flannel/Calico 的 VXLAN Overlay 网络使用的是 8472 端口，并非Linux内核vxlan机制使用4789端口。
+
+```shell script
+ip -d link show flannel.1
+iptables -I INPUT -p udp -s $IDC_INNER_SEGMET --dport 8472 -j ACCEPT
+```
+
+## 8. 网络故障排查套路
+
+NodeIP+PortNode -->
