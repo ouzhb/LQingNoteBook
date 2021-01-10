@@ -60,11 +60,11 @@ kubectl -n harbor exec  harbor-harbor-database-0 -- pg_dump -U postgres --insert
 
 ```shell
 # AWSCA 
-PGPASSWORD=LqA8PsEkYM psql -h kong.c8ntakcosoeb.us-west-1.rds.amazonaws.com -p 5431  -d registry -U user_kwdsiYLenK -f xxx.sql
+PGPASSWORD={PASSWORD} psql -h {HOST_IP} -p 5431  -d registry -U {USERNAME} -f xxx.sql
 # HK
-PGPASSWORD=LqA8DsEkYM psql -h master.all.pgsql.hk.sdp -p 5431  -d registry -U user_lkewiYLenK -f xxx.sql
+PGPASSWORD={PASSWORD} psql -h {HOST_IP} -p 5431  -d registry -U {USERNAME} -f xxx.sql
 # cl
-PGPASSWORD=LqclFcXyYM psql -h master.cl.all.pgsql.sdp -p 5431  -d registry -U user_lqcliYLenK -f xxx.sql
+PGPASSWORD={PASSWORD} psql -h {HOST_IP} -p 5431  -d registry -U {USERNAME} -f xxx.sql
 ```
 # 升级问题回顾
 
