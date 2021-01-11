@@ -121,6 +121,15 @@ ip -d link show flannel.1
 iptables -I INPUT -p udp -s $IDC_INNER_SEGMET --dport 8472 -j ACCEPT
 ```
 
-## 8. 网络故障排查套路
+## 8. 限制容器Core文件
 
-NodeIP+PortNode -->
+docker 添加以下配置
+```yaml
+  "default-ulimits": {
+   "core": {
+      "Name": "core",
+      "Hard": 0,
+      "Soft": 0
+    }
+  }
+```
