@@ -56,6 +56,8 @@ docker kill {api-id}
 - scheduler.conf 
 - kubelet.conf
 - API-Server.yaml
+- kube-proxy 服务
+- SDP相关服务
 
 PS：对于kubelet.conf可以删除旧文件，并创建 bootstrap-kubelet.conf 重新引导
 

@@ -76,6 +76,190 @@ PGPASSWORD={PASSWORD} psql -h {HOST_IP} -p 5431  -d registry -U {USERNAME} -f xx
 - GC停止方式：删除数据库记录、admin_job表、清除redis缓存、重启jobservice
 - HK 环境垃圾收集失败，registryctl 容器有 distribution 相关异常。社区的解决方案（[issues-2695](https://github.com/docker/distribution/issues/2695)）：降级到2.5.2版本（2.6.x、2.7.1 都有类似异常）
 
+
+
+# 1.9.x 升级2.0.2 分析
+
+**重要事项**：
+
+- 升级前请一定备份数据库！！！！！
+- **请打开Debug日志**，从debug日志可以大概判断进度
+- 做好充足准备升级时间可能极度漫长，**建议直接编辑存活探针到3个小时以上，或者在values.xml中加入配置core.livenessProbe.initialDelaySeconds**
+
+## 升级源码分析
+
+升级过程的时间长短主要取决于**artifact**表的大小！
+
+**harbor-core**容器的工作目录如下：
+
+```shell
+/harbor/entrypoint.sh  
+/harbor/harbor_core    # 主程序
+/harbor/install_cert.sh
+/harbor/migrations    # postgresql 的sql文件
+/harbor/versions      # 各个组件的版本信息
+/harbor/views
+```
+
+启动脚本为**entrypoint.sh**，内容如下：
+
+```shell
+#!/bin/sh
+set -e
+/harbor/install_cert.sh # 该脚本将用户的证书CP到容器内的指定位置
+/harbor/harbor_core     
+```
+
+**harbor-core**的main函数中，**migration/migration.go**的**Migrate(database *models.Database) **方法是整个迁移操作的入口。
+
+```go
+func Migrate(database *models.Database) error {
+	// 这里migrator是一个db迁移对象，来自于golang-migrate 这个迁移工具
+	migrator, err := dao.NewMigrator(database.PostGreSQL)  
+	if err != nil {
+		return err
+	}
+	defer migrator.Close()
+	
+    // 获取当前DB的schema版本信息
+	schemaVersion, _, err := migrator.Version()
+	if err != nil && err != migrate.ErrNilVersion {
+		return err
+	}
+	log.Debugf("current database schema version: %v", schemaVersion)
+	// prior to 1.9, version = 0 means fresh install
+	if schemaVersion > 0 && schemaVersion < 10 {
+		return fmt.Errorf("please upgrade to version 1.9 first")
+	}
+
+    // 升级Schema
+	// 更新pg中的schema文件，应该是从/harbor/migrations中读取sql文件在数据库中执行
+    // 具体实现是 common/dao/pgsql.go:105 的 UpgradeSchema() 函数，该函数中调用的是 golang-migrate 工具的接口
+	if err := dao.UpgradeSchema(database); err != nil {
+		return err
+	}
+
+    // 升级DB的记录
+	// 根据 schema_migrations 表的 data_version 版本判断数据的版本
+	ctx := orm.NewContext(context.Background(), beegorm.NewOrm())
+	dataVersion, err := getDataVersion(ctx)
+	if err != nil {
+		return err
+	}
+	log.Debugf("current data version: %v", dataVersion)
+	// the abstract logic already done before, skip
+	if dataVersion == 30 {
+		log.Debug("no change in data, skip")
+		return nil
+	}
+
+	// 数据升级入口函数，该节点非常消耗时间
+	if err = upgradeData(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+```
+
+**upgradeData(ctx context.Context)** 接口是数据升级的入口，数据升级时主要涉及到下面这几张表。该函数的主要结构即依照下面三张表构成了一个三层循环函数：
+
+- project：项目信息表
+- repository：镜像信息表
+- artifact：镜像版本信息表
+
+```go
+func upgradeData(ctx context.Context) error {
+    // abstractor 中封装了 regCli 以及 artifact 的db操作接口
+	abstractor := art.NewAbstractor()
+	pros, err := project.Mgr.List()
+	if err != nil {
+		return err
+	}
+    
+    // 循环1
+	for _, pro := range pros {
+		repos, err := repository.Mgr.List(ctx, &q.Query{
+			Keywords: map[string]interface{}{
+				"ProjectID": pro.ProjectID,
+			},
+		})
+		if err != nil {
+			log.Errorf("failed to list repositories under the project %s: %v, skip", pro.Name, err)
+			continue
+		}
+        
+        // 循环2
+		for _, repo := range repos {
+			log.Debugf("abstracting artifact metadata under repository %s ....", repo.Name)
+			arts, err := artifact.Mgr.List(ctx, &q.Query{
+				Keywords: map[string]interface{}{
+					"RepositoryID": repo.RepositoryID,
+				},
+			})
+			if err != nil {
+				log.Errorf("failed to list artifacts under the repository %s: %v, skip", repo.Name, err)
+				continue
+			}
+            
+            // 循环3：主要目的即更新artifact的数据库结构
+			for _, art := range arts {
+				// abstract 根据references字段递归更新数据库记录，实际生产中发现 这张表并没有 references 字段
+                // 但是数据库中还有一张 artifact_reference 表，不过貌似也是空的
+				if err = abstract(ctx, abstractor, art); err != nil {
+					log.Errorf("failed to abstract the artifact %s@%s: %v, skip", art.RepositoryName, art.Digest, err)
+					continue
+				}
+                // artifact
+				if err = artifact.Mgr.Update(ctx, art); err != nil {
+					log.Errorf("failed to update the artifact %s@%s: %v, skip", repo.Name, art.Digest, err)
+					continue
+				}
+			}
+			log.Debugf("artifact metadata under repository %s abstracted", repo.Name)
+		}
+	}
+
+	// 更新函数
+	return setDataVersion(ctx, 30)
+}
+
+// 递归的 abstract 
+func abstract(ctx context.Context, abstractor art.Abstractor, art *artifact.Artifact) error {
+	// abstract the children
+	for _, reference := range art.References {
+		child, err := artifact.Mgr.Get(ctx, reference.ChildID)
+		if err != nil {
+			log.Errorf("failed to get the artifact %d: %v, skip", reference.ChildID, err)
+			continue
+		}
+		if err = abstract(ctx, abstractor, child); err != nil {
+			log.Errorf("failed to abstract the artifact %s@%s: %v, skip", child.RepositoryName, child.Digest, err)
+			continue
+		}
+	}
+	// 同步abstract 的metadata信息 ~~~ 数据升级的关键
+    // 调用 PullManifest 方法
+	return abstractor.AbstractMetadata(ctx, art)
+}
+```
+
+**AbstractMetadata**会调用registryCli来获取S3数据存储中的实际元数据信息，该方法实际上调用的是一个HTTP Get请求
+
+对应的URL为 **/v2/{镜像名称}/manifests/{tag信息}**，示例如下。
+
+```go
+/v2/5fb68a6309d09c00102a3feb/consumer-video/manifests/sha256:fc89853b8e5c0c377549ad60444ff8ec6a26597969207b454fb3b8f078caca8a
+```
+
+未完待续！！
+
+
+
+
+
+
+
 # 参考
 
 [Harbor 镜像扫描](https://youendless.com/post/harbor_image_scan/)
