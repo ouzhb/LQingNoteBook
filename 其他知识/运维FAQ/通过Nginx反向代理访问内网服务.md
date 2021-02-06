@@ -7,40 +7,39 @@ Kubernetes 服务部署在独立机房（网络A），需要访问公司开发�
 
 ## 网络模型
 
-- 机器A：10.33.6.149 位于A网络
+- 机器A：A.A.A.A 位于A网络
     
-    - k8s.registry.101.sdp等域名被解析到10.33.6.149
+    - k8s.registry.domain 等域名被解析到A.A.A.A
     
-    - 配置以下规则，
+    - 机器A配置以下规则，
     ```shell script
-    ACCEPT     tcp  --  172.24.133.166       0.0.0.0/0            tcp dpt:4507
+    ACCEPT     tcp  --  B.B.B.B       0.0.0.0/0            tcp dpt:4507
     ```
   
-    - 配置以下Nginx的反向代理：
+    - 机器A，配置以下Nginx的反向代理：
     ```shell script
-    upstream k8s.registry.101.sdp{
-    	server 172.24.133.166:4507;
+    upstream k8s.registry.domain{
+    	server B.B.B.B:4507;
     }
     	
     server
     {
     	listen 80;
-    	server_name k8s.registry.101.sdp;
+    	server_name k8s.registry.domain;
     	
     	   location / {
     		#wx lan
-    		allow 10.33.38.0/24;
-    	    allow 10.33.17.0/24;
+    		allow B.B.B.0/24;
     		deny all;
     	    proxy_redirect off;
     	    proxy_set_header Host $host;
     	    proxy_set_header X-Real-IP $remote_addr;
     	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    	    proxy_pass http://k8s.registry.101.sdp;
+    	    proxy_pass http://k8s.registry.domain;
     		
     	}
     	
-    	access_log logs/k8s.registry.101.sdp_access.log main;
+    	access_log logs/k8s.registry.domain_access.log main;
     }
     ```
 

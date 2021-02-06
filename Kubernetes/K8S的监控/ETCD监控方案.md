@@ -38,6 +38,32 @@ kubectl  create secret tls etcd-healthcheck-client --cert=/etc/etcd/healthcheck-
         scrape_interval: 1m
         scrape_timeout: 30s
 ```
+etcd 部署在Master节点时
+```yaml
+      - job_name: etcd
+        scheme: https
+        metrics_path: /metrics
+        tls_config:
+          cert_file: "/etc/secrets/etcd-healthcheck-client/tls.crt"
+          key_file: '/etc/secrets/etcd-healthcheck-client/tls.key'
+          insecure_skip_verify: true
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+          - source_labels:  ["__meta_kubernetes_node_labelpresent_node_role_kubernetes_io_master"]
+            regex: "true"
+            action: keep
+          - regex: (.*)
+            replacement: ${1}:2379
+            source_labels:
+            - __meta_kubernetes_node_address_InternalIP
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+        scrape_interval: 1m
+        scrape_timeout: 30s
+```
+
 异常告警配置
 ```yaml
 略

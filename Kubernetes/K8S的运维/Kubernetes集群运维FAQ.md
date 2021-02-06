@@ -112,13 +112,29 @@ def socket_test(host, port):
 
 参考 nginx-ingress TLS相关配置：https://kubernetes.github.io/ingress-nginx/user-guide/tls/
 
-## 7. iptables 问题造成的 fannel 网络异常
+## 7. iptables 配置文件
+
+### 1. fannel 网络异常
 
 Flannel/Calico 的 VXLAN Overlay 网络使用的是 8472 端口，并非Linux内核vxlan机制使用4789端口。
 
 ```shell script
 ip -d link show flannel.1
 iptables -I INPUT -p udp -s $IDC_INNER_SEGMET --dport 8472 -j ACCEPT
+```
+
+### 2. svc 服务不能正常访问
+
+宿主机raw表的PREROUTING、OUTPUT链添加NOTRACK规则（如下），导致回程报文不能正确转发。
+
+```shell script
+# 下面两条规则使宿主机不能访问SVC的IP，该节点上的容器也不能访问外网的服务的80、443端口
+-A PREROUTING -p tcp -m multiport --dports 80,443 -j NOTRACK
+-A OUTPUT -p tcp -m multiport --dports 80,443 -j NOTRACK
+
+# ps: iptables中的说有 NOTRACK 规则都要额外注意
+iptables -t raw -nvL PREROUTING
+iptables -t raw -nvL OUTPUT
 ```
 
 ## 8. 限制容器Core文件
@@ -133,3 +149,31 @@ docker 添加以下配置
     }
   }
 ```
+
+## 9. Node节点无法上线
+
+排查时遵循以下思路：
+
+- Kubelet 能否连接API Server，导致连接失败的有以下几个原因：
+    - API Server 服务端证书过期，请升级证书
+    - kubelet.conf 中的Client证书过期，请删除使用 bootstrap-kubelet.conf 重新引导。
+    - 网络异常，Iptables 规则未配置，VIP不可访问
+    
+- Kubelet 能够启动，容器不能正常启动：
+    - 通过日志判断 Flannel 插件是否正常工作，很大可能是 kubernetes.svc 连接失败
+    - 查看 kube-proxy 日志，并通过 ipvsadm -l --tcp-service <kubernetes.svc> 查看vip是否正常。kube-proxy 是通过控制面网络访问API Server的，请在CM中确认配置。
+
+ 
+## 10. DNS 迁移
+
+容器配置DNS策略为default时，变动宿主机的 DNS IP 不会同步到容器中！！  需要注意的是以下文件都是k8s mount到容器中的：
+
+```shell script
+/etc/resolv.conf
+/etc/hostname
+/etc/hosts
+```  
+
+    
+    
+
