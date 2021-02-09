@@ -18,6 +18,7 @@
 - kube-controller-manager
 - kube-scheduler
 - harbor
+- coredns
 - falcon-agent
 - sdp-paas-api
 
