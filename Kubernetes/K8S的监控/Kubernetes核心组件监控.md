@@ -30,7 +30,6 @@
 | falcon-agent   | http://127.0.0.1:1988/health    |                          |        |
 | kube-proxy     | http://127.0.0.1:10249/healthz  |                          |        |
 | kubelet        | https://127.0.0.1:10250/healthz | admin.conf 生成的SSL证书 |        |
-| kube-scheduler | https://127.0.0.1:10259/healthz | admin.conf 生成的SSL证书 |        |
 |                |                                 |                          |        |
 
 其他拨测的服务：

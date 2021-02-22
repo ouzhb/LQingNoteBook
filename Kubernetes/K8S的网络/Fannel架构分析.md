@@ -70,17 +70,23 @@ EnvironmentFile=/run/flannel/subnet.env
 ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --cluster-store=etcd://172.24.33.77:2379 --cluster-advertise=172.24.33.112:2375 --bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU}
 ```
 
-## 2. UDP/VXLAN 模式
+# K8S+Flannel
 
-- docker的默认网桥docker0会从主机对应的sunnet获取ip
+- Flannel的三种模式
+  - UDP/VXLAN
+  - Host-gw
+  - Directrouting
 
-- 所有容器的veth一端连接到docker0
-- 宿主机上会出现一个特殊的网络设备flannel0，查看路由可知所有Subnet的包从该设备进出。
-- 容器的外网能力，依然通过docker0的NAT能力来实现
+- 几种模式的区别
 
-## 3. host-gw 模式
+  - UDP和VXLAN的主要区别在于：
+    - UDP 模式下flannel0是一个单纯的tun设备，UDP报文的封装在flanneld进程（用户态）中进行
+    - VXLAN模式下flannel.1是一个vxlan设备，UDP报文的封装在内核中已经完成
+  - host-gw模式
+    - 不存在flannel.x设备，流量出口是宿主机的网卡
+    - **基于二层网络来工作，将宿主机作为POD子网的网关，要求所有的物理机在一个二层子网**
 
+- 所有模式下，POD的网络设备都是一个veth，一端在容器内（配置容器IP），另一端在宿主的网络空间的cni0网桥上
 
-
-
+  
 
