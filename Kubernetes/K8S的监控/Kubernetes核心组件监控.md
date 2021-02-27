@@ -33,8 +33,7 @@
 
 ## 3. 其他监控
 
-- kube-flannel
-
+- kube-flannel：可以通过**healthz-port** 配置打开拨测端口，默认情况下这个端口是不开放的。
 - iptable规则检查
 - 宿主机DNS检查
 
